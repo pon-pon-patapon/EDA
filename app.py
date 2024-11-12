@@ -46,6 +46,10 @@ if uploaded_file:
     fig.update_layout(title="EDA Analysis with Perturbation Colors and Dig1 Points",
                       xaxis_title="Time_sec", yaxis_title="EDA")
 
+     # 各グラフを縦に表示
+    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig2, use_container_width=True)
+
     # 選択されたポイントを保持するためのセッション状態
     if "selected_points" not in st.session_state:
         st.session_state.selected_points = []
