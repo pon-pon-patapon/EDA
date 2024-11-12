@@ -50,20 +50,23 @@ if uploaded_file:
     if "selected_points" not in st.session_state:
         st.session_state.selected_points = []
 
-    # インタラクティブなクリック機能の追加
-    click_data = st.plotly_chart(fig, use_container_width=True).click_event_data  # click_event_dataは座標取得用のイベント
+    # グラフを表示
+    st.plotly_chart(fig, use_container_width=True)
 
-    # クリックした座標を取得しテーブルに追加
-    if click_data:
-        selected_x = click_data["points"][0]["x"]
-        selected_y = click_data["points"][0]["y"]
+    # 手動でポイントを追加するための数値入力
+    st.write("## Select Points Manually")
+    selected_x = st.number_input("Select X (Time_sec)", value=0.0)
+    selected_y = st.number_input("Select Y (EDA)", value=0.0)
+
+    # 入力されたポイントをセッション状態に追加
+    if st.button("Add Point"):
         st.session_state.selected_points.append({"Time_sec": selected_x, "EDA": selected_y})
-
-    # 選択されたポイントの表示
-    st.write("## Selected Points Table")
-    if st.session_state.selected_points:
-        st.write(pd.DataFrame(st.session_state.selected_points))
 
     # テーブル内のポイントの削除
     if st.button("Clear Points"):
         st.session_state.selected_points.clear()
+
+    # 選択されたポイントの表示
+    st.write("### Selected Points Table")
+    if st.session_state.selected_points:
+        st.write(pd.DataFrame(st.session_state.selected_points))
