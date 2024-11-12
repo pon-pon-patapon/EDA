@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 # アプリのタイトル
 st.title("Enhanced EDA Data Visualization App")
@@ -15,47 +14,47 @@ if uploaded_file:
     data = pd.read_csv(uploaded_file)
     st.write("Data Preview:", data.head())
 
-    # プロットの作成（背景白）
-    fig = make_subplots(rows=1, cols=2, subplot_titles=("EDA over Time", "Additional Plot"))
-    fig.update_layout(template="plotly_white")  # ダークモードでも見やすいように背景を白に
-
     # Perturbationが1のデータを黒い線でプロット
+    fig1 = go.Figure()
     perturbation_1 = data[data["Perturbation"] == 1]
-    fig.add_trace(go.Scatter(x=perturbation_1["Time_sec"], y=perturbation_1["EDA"],
+    fig1.add_trace(go.Scatter(x=perturbation_1["Time_sec"], y=perturbation_1["EDA"],
                              mode="lines", line=dict(color="white", width=0.5),
-                             name="Perturbation: 1"), row=1, col=1)
+                             name="Perturbation: 1"))
 
     # Perturbationが2のデータを青い線でプロット
     perturbation_2 = data[data["Perturbation"] == 2]
-    fig.add_trace(go.Scatter(x=perturbation_2["Time_sec"], y=perturbation_2["EDA"],
+    fig1.add_trace(go.Scatter(x=perturbation_2["Time_sec"], y=perturbation_2["EDA"],
                              mode="lines", line=dict(color="blue", width=0.5),
-                             name="Perturbation: 2"), row=1, col=1)
+                             name="Perturbation: 2"))
 
     # Dig1が1のポイントを赤い丸で強調表示
     dig1_points = data[data["Dig1"] == 5]
-    fig.add_trace(go.Scatter(x=dig1_points["Time_sec"], y=dig1_points["EDA"],
+    fig1.add_trace(go.Scatter(x=dig1_points["Time_sec"], y=dig1_points["EDA"],
                              mode="markers", marker=dict(color="red", size=10, line=dict(color="black", width=1)),
-                             name="Dig1 Points"), row=1, col=1)
+                             name="Dig1 Points"))
 
-    # 追加のプロット（例: 他のEDA分析結果）
-    fig.add_trace(go.Scatter(x=data["Time_sec"], y=data["EDA"].rolling(window=10).mean(),
+    # グラフのレイアウト設定（背景白）
+    fig1.update_layout(title="EDA over Time with Perturbation Colors and Dig1 Points",
+                       xaxis_title="Time_sec", yaxis_title="EDA",
+                       template="plotly_white")
+
+    # 2つ目のプロット（例: 移動平均のプロット）
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(x=data["Time_sec"], y=data["EDA"].rolling(window=10).mean(),
                              mode="lines", line=dict(color="green", width=2),
-                             name="Moving Average (Window=10)"), row=1, col=2)
+                             name="Moving Average (Window=10)"))
 
-    # グラフのレイアウト設定
-    fig.update_layout(title="EDA Analysis with Perturbation Colors and Dig1 Points",
-                      xaxis_title="Time_sec", yaxis_title="EDA")
+    fig2.update_layout(title="Moving Average of EDA (Window=10)",
+                       xaxis_title="Time_sec", yaxis_title="EDA",
+                       template="plotly_white")
 
-     # 各グラフを縦に表示
+    # 各グラフを縦に表示
     st.plotly_chart(fig1, use_container_width=True)
     st.plotly_chart(fig2, use_container_width=True)
 
     # 選択されたポイントを保持するためのセッション状態
     if "selected_points" not in st.session_state:
         st.session_state.selected_points = []
-
-    # グラフを表示
-    st.plotly_chart(fig, use_container_width=True)
 
     # 手動でポイントを追加するための数値入力
     st.write("## Select Points Manually")
